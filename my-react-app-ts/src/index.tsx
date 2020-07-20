@@ -7,13 +7,11 @@ interface SquarePropsInterface {
   onClick: () => void;
 }
 
-const Square: React.FC<SquarePropsInterface> = (value, onClick) => {
-  return (
-    <button className="square" onClick={(): void => onClick()}>
-      {value}
-    </button>
-  );
-};
+const Square = (props: SquarePropsInterface): JSX.Element => (
+  <button className="square" onClick={(): void => props.onClick()}>
+    {props.value}
+  </button>
+);
 
 interface BoardPropsInterface {
   squares: string[];
@@ -21,6 +19,7 @@ interface BoardPropsInterface {
 
 interface BoardStateInterface {
   squares: string[];
+  xIsNext: boolean;
 }
 
 class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
@@ -28,13 +27,14 @@ class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
     super(props);
     this.state = {
       squares: Array(9).fill(''),
+      xIsNext: true,
     };
   }
 
   handleClick(i: number): void {
     const squares = this.state.squares.slice();
-    squares[i] = 'X';
-    this.setState({ squares: squares });
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({ squares: squares, xIsNext: !this.state.xIsNext });
   }
 
   renderSquare(i: number): JSX.Element {
@@ -47,7 +47,7 @@ class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
   }
 
   render(): JSX.Element {
-    const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
     return (
       <div>
