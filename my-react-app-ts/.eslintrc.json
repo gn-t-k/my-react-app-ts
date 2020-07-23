@@ -4,5 +4,8 @@
     "plugin:react/recommended",
     "plugin:prettier/recommended",
     "prettier/@typescript-eslint"
-  ]
+  ],
+  "rules": {
+    "react/prop-types": ["off"]
+  }
 }

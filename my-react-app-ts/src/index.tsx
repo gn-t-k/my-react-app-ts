@@ -7,7 +7,7 @@ interface SquarePropsInterface {
   onClick: () => void;
 }
 
-const Square = (props: SquarePropsInterface): JSX.Element => (
+const Square: React.FC<SquarePropsInterface> = (props) => (
   <button className="square" onClick={(): void => props.onClick()}>
     {props.value}
   </button>
@@ -15,6 +15,7 @@ const Square = (props: SquarePropsInterface): JSX.Element => (
 
 interface BoardPropsInterface {
   squares: string[];
+  onClick: (i: number) => void;
 }
 
 interface BoardStateInterface {
@@ -44,41 +45,18 @@ const calculateWinner = (squares: string[]): string | null => {
 };
 
 class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
-  constructor(props: BoardPropsInterface) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(''),
-      xIsNext: true,
-    };
-  }
-
-  handleClick(i: number): void {
-    const squares = this.state.squares.slice();
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
-    this.setState({ squares: squares, xIsNext: !this.state.xIsNext });
-  }
-
   renderSquare(i: number): JSX.Element {
     return (
       <Square
-        value={this.state.squares[i]}
-        onClick={(): void => this.handleClick(i)}
+        value={this.props.squares[i]}
+        onClick={(): void => this.props.onClick(i)}
       />
     );
   }
 
   render(): JSX.Element {
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
-    } else {
-      status = 'Next Player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
-
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -99,15 +77,63 @@ class Board extends React.Component<BoardPropsInterface, BoardStateInterface> {
   }
 }
 
-class Game extends React.Component {
+interface GameStateInterface {
+  history: { squares: string[] }[];
+  xIsNext: boolean;
+}
+
+class Game extends React.Component<{}, GameStateInterface> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      history: [
+        {
+          squares: Array(9).fill(''),
+        },
+      ],
+      xIsNext: true,
+    };
+  }
+
+  handleClick(i: number): void {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({
+      history: history.concat([
+        {
+          squares: squares,
+        },
+      ]),
+      xIsNext: !this.state.xIsNext,
+    });
+  }
+
   render(): JSX.Element {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next Player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={Array(9).fill('')} />
+          <Board
+            squares={current.squares}
+            onClick={(i): void => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
