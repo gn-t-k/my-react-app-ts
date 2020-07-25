@@ -2,9 +2,11 @@ import React from 'react';
 import Square from './square';
 
 interface BoardPropsInterface {
-  squares: string[];
+  squares: ISquare[];
   onClick: (i: number) => void;
 }
+
+type ISquare = 'X' | 'O' | null;
 
 const Board: React.FC<BoardPropsInterface> = (props) => {
   const renderSquare = (i: number): JSX.Element => (
