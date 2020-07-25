@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import Board from './board';
-
-interface HistoryElement {
-  squares: ISquare[];
-}
-
-type History = HistoryElement[];
-
-type ISquare = 'X' | 'O' | null;
+import { History, ISquare } from '../domain/entity';
 
 const calculateWinner = (squares: ISquare[]): ISquare => {
   const lines = [

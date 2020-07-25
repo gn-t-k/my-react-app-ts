@@ -1,6 +1,5 @@
 import React from 'react';
-
-type ISquare = 'X' | 'O' | null;
+import { ISquare } from '../domain/entity';
 
 interface SquarePropsInterface {
   value: ISquare;
